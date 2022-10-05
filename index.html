@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Drag & Drop Modal</title>
+    <meta
+      name="description"
+      content="Simple draggable modal with pure Javascript, inspired by Google Modal."
+    />
+    <meta name="author" content="Marcelo Dolce" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="http://fonts.googleapis.com/css?family=Lato:300,400,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/modal.css" />
+  </head>
+  <body>
+    <button class="modal-header-btn modal-trigger btn-fixed">
+      Open Alerts Confirmation
+    </button>
+
+    <!-- modal -->
+    <div class="modal">
+      <header class="modal-header">
+        <h1 class="modal-header-title left">Title of Alerts Confirmation</h1>
+        <button class="modal-header-btn right modal-close" title="Close Modal">
+          OK
+        </button>
+      </header>
+    </div>
+    <!-- modal -->
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/draggabilly@3/dist/draggabilly.pkgd.min.js"></script>
+    <script src="modal.js"></script>
+    <script>
+      window.onload = () => {
+        Modal.init();
+      };
+    </script>
+  </body>
+</html>
