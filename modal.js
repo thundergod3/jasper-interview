@@ -1,99 +1,92 @@
-const Modal = (function () {
+const state = {
+  isDragging: false,
+  isHidden: true,
+  xDiff: 0,
+  yDiff: 0,
+  x: 50,
+  y: 50,
+};
+
+function ready(fn) {
+  if (
+    document.attachEvent
+      ? document.readyState === "complete"
+      : document.readyState !== "loading"
+  ) {
+    fn();
+  } else {
+    document.addEventListener("DOMContentLoaded", fn);
+  }
+}
+
+function renderModal(modal, myState) {
+  const modalOverlay = document.querySelectorAll(".modal-overlay");
+
+  if (state.isHidden) {
+    modal.style.visibility = "hidden";
+    modal.style.opacity = 0;
+    modal.classList.add("closing");
+    modal.classList.remove("opening");
+    modalOverlay[0].classList.add("closing");
+    modalOverlay[0].classList.remove("opening");
+  } else {
+    modal.style.visibility = "visible";
+    modal.style.opacity = 1;
+    modal.classList.add("opening");
+    modal.classList.remove("closing");
+    modalOverlay[0].classList.add("opening");
+    modalOverlay[0].classList.remove("closing");
+  }
+
+  modal.style.transform = "translate(" + myState.x + "px, " + myState.y + "px)";
+}
+
+function onMouseMove(e) {
+  if (state.isDragging) {
+    state.x = e.pageX - state.xDiff;
+    state.y = e.pageY - state.yDiff;
+  }
+
+  const modal = document.querySelectorAll(".modal");
+  renderModal(modal[0], state);
+}
+
+function onMouseDown(e) {
+  state.isDragging = true;
+  state.xDiff = e.pageX - state.x;
+  state.yDiff = e.pageY - state.y;
+}
+
+function onMouseUp() {
+  state.isDragging = false;
+}
+
+function closeModal() {
+  state.isHidden = true;
+
+  const modal = document.querySelectorAll(".modal");
+  renderModal(modal[0], state);
+}
+
+ready(() => {
   const modalOverlay = document.createElement("div");
+  const modal = document.querySelectorAll(".modal");
+
   modalOverlay.setAttribute("class", "modal-overlay");
   document.body.appendChild(modalOverlay);
+  renderModal(modal[0], state);
 
-  const config = {
-    $modal: document.querySelector(".modal"),
-    $modalOverlay: document.querySelector(".modal-overlay"),
-    modalOverlayColor: "rgba(255,255,255,0.7)",
-    $modalClose: document.querySelector(".modal-close"),
-    $modalTrigger: document.querySelector(".modal-trigger"),
-    $draggie: new Draggabilly(document.querySelector(".modal"), {
-      handle: ".modal-header",
-      containment: "html",
-    }),
-  };
-  config.$modalOverlay.style.background = config.modalOverlayColor;
+  const modalHeader = document.querySelectorAll(".modal-header");
+  modalHeader[0].addEventListener("mousedown", onMouseDown);
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mouseup", onMouseUp);
 
-  const Modal = {
-    createEvent: function (eventName, callback) {
-      const event = document.createEvent("HTMLEvents");
-      event.initEvent(eventName, true, false);
-      config.$modal.dispatchEvent(event);
+  const closeButton = document.querySelectorAll(".modal-close");
+  closeButton[0].addEventListener("click", closeModal);
 
-      if (callback && typeof callback === "function") {
-        callback();
-      }
-    },
-    open: function () {
-      config.$modal.style.visibility = "visible";
-      config.$modal.classList.add("opening");
-      config.$modal.classList.remove("closing");
-
-      config.$modalOverlay.style.visibility = "visible";
-      config.$modalOverlay.classList.add("opening");
-      config.$modalOverlay.classList.remove("closing");
-
-      Modal.createEvent("modalOpened", function () {
-        //callback
-      });
-    },
-    close: function () {
-      config.$modal.classList.add("closing");
-      config.$modal.classList.remove("opening");
-      config.$modalOverlay.classList.add("closing");
-      config.$modalOverlay.classList.remove("opening");
-
-      const timer = window.setTimeout(function () {
-        config.$modal.style.visibility = "hidden";
-        config.$modalOverlay.style.visibility = "hidden";
-
-        Modal.createEvent("modalClosed", function () {
-          //callback
-        });
-      }, 500);
-    },
-    init: function () {
-      config.$draggie.on("dragStart", function (instance, event, pointer) {
-        console.log(
-          "dragMove on " +
-            event.type +
-            pointer.pageX +
-            ", " +
-            pointer.pageY +
-            " position at " +
-            instance.position.x +
-            ", " +
-            instance.position.y
-        );
-      });
-
-      config.$modalClose.addEventListener(
-        "click",
-        function () {
-          Modal.close();
-        },
-        false
-      );
-
-      config.$modalTrigger.addEventListener(
-        "click",
-        function () {
-          Modal.open();
-        },
-        false
-      );
-
-      config.$modal.addEventListener("modalOpened", function () {
-        console.log("Modal Opened");
-      });
-      config.$modal.addEventListener("modalClosed", function () {
-        console.log("Modal Closed");
-      });
-    },
-  };
-
-  Modal.config = config;
-  return Modal;
-})();
+  const toggleButton = document.querySelectorAll(".modal-trigger");
+  toggleButton[0].addEventListener("click", function () {
+    state.isHidden = !state.isHidden;
+    renderModal(modal[0], state);
+  });
+});
