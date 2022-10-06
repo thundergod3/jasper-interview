@@ -65,6 +65,10 @@ function closeModal() {
   state.isHidden = true;
 
   const modal = document.querySelectorAll(".modal");
+  state.x = 50;
+  state.y = 50;
+  state.xDiff = 0;
+  state.yDiff = 0;
   renderModal(modal[0], state);
 }
 
